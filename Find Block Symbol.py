@@ -11,6 +11,7 @@ doc = Document.getCurrentDocument()
 IS32BIT = not doc.is64Bits()
 
 def searchBlockReference(segment, baseAddr, callfuncName = "NoFunc"):
+  print "base addr 0x%x" % baseAddr 
   for x in xrange(baseAddr - 24,baseAddr + 24, 2):
     # the addr which point to maybe a block
     r = segment.getReferencesFromAddress( x )
@@ -22,11 +23,16 @@ def searchBlockReference(segment, baseAddr, callfuncName = "NoFunc"):
       if proc:
         startAddr = proc.getEntryPoint()
         name = refSeg.getNameAtAddress( startAddr )
-        if name and name.find("block_invoke") != -1:
-          print "find ", hex( startAddr )
-          return True, startAddr, name 
+        if IS32BIT:
+          if name.find("sub") != -1:
+            return True, startAddr, callfuncName + "_block_invoke"
+        else:
+          if name and name.find("block_invoke") != -1:
+            print "find ", hex( startAddr )
+            return True, startAddr, name 
       else:
         segmentName, sectionName = getSegmentAndSection( addr )
+        name = ""
         if segmentName == "__TEXT" and sectionName == "__text" :
           # it`s in code section, make the function name as block_invoke prefix immediately
           name = callfuncName + "_block_invoke"
