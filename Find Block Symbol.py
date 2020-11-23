@@ -125,6 +125,8 @@ for gbRef in refsToGBSymbol:
 
     # if hopper does not parse function which call the block
     # then we search who reference the globalBlock define
+    if not name:
+      continue
     if name.find("block_invoke") == -1:
       refsToGlobalBlockDef = seg.getReferencesOfAddress( gbRef )
       for funcAddr in refsToGlobalBlockDef:
